@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="demo.css" />
+    <link rel="stylesheet" href="lib/mocha.css" />
+	<script src="file:///android_asset/app.js"></script>
+  </head>
+  <body>
+	<div id="demo">
+	  <hr />
+	<h1>Extensible Calculator</h1>
+	<hr />
+	  <h2 class="title">Demonstration</h2>
+	<table>
+	  <tr>
+		<th>Expression: </th>
+		<td><input class="active" type="text" id="expr" value="5 + 5" autofocus="autofocus" onchange="getResult()"/></td>
+		<td rowspan="2"><button class="demo" onclick="getResult()">Get Result</button></td></tr>
+	  <tr>
+		<th>Result: </th>
+		<td><input class="active" type="text" id="rslt" onchange="getResult()"/></td>
+	  </tr>
+      <tr>
+        <th class="lower16">Available </th>
+      </tr>
+      <tr>
+        <th class="lower8">Operators: </th>
+    	<td><input class="disabled" type="text" id="oper" disabled="disabled"/></td>
+	  </tr>
+         <tr>
+        <th class="lower16">Grouping </th>
+      </tr>
+      <tr>
+        <th class="lower8">Brackets: </th>
+    	<td><input class="disabled" type="text" id="grbr" disabled="disabled"/></td>
+	  </tr>
+	</table>
+	</div>
+	<hr />
+	<h2 class="title">Testing</h2>
+    <div id="mocha"></div>
+    <script src="lib/mocha.js"></script>
+    <script>mocha.setup('bdd')</script>
+    <script src="../extensible-calculator.js"></script>
+    <script src="lib/should.js"></script>
+    <script src="tests.js"></script>
+	<script>
+      var xcalc = new ExtensibleCalculator();
+      oper.value = xcalc.operators.list.join("\u2002");
+      grbr.value = xcalc.brackets.list.join("\u2002");
+	  function getResult() {
+	    rslt.value = xcalc.calculate(xcalc.convert(expr.value)).valueOf();
+		expr.focus();
+	  }
+    
+	</script>
+	
+    <script>
+      mocha.run();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+@charset "utf-8";
+
+body { 
+  background-color: white;
+  color: black;
+  font-family: 'Raleway', sans-serif;
+
+}
+#demo {
+  margin: 60px 0px 60px 0px;
+  width: 100%;
+}
+#demo h1 {
+  text-align: center;
+}
+.lower8 {
+  bottom: -8px;
+  position: relative;
+}
+.lower16 {
+  bottom: -16px;
+  position: relative;
+}
+.demo {
+    height: 200%;
+    margin-right: 15px;
+    padding: 15px 15px;
+    text-size: 32px%;
+}
+.active {
+  background-color: Azure;
+}
+.disabled {
+  background-color: AliceBlue;
+}
+h2, #demo table {
+  margin-left: 15px;
+}
+h2.title {
+  color: #4444FF;
+  font-style: italic;
+}
+input {
+  font-size: 150%;
+  padding-left: 8px;
+  width: 90%;
+}
+th { 
+  text-align: left; 
+}
+td {
+  margin: 0;
+  width: 75%;
+}
