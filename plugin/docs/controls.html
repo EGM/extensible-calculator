@@ -1,0 +1,78 @@
+<!DOCTYPE html> 
+<html>
+
+  <head>
+	<title>GIF Image Methods</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet"  href="../css/themes/default/theme.min.css" />
+	<link rel="stylesheet"  href="../css/themes/default/jquery.mobile.structure-1.2.0.min.css" />
+	<script src="../js/energize-min.js"></script>
+	<script src="../js/jquery-1.8.1.min.js"></script>
+	<script src="../../../app.js"></script>
+	<script src="../js/example.js"></script>
+	<link rel="stylesheet" href="../css/docs.css" />
+	<script src="../js/jquery.mobile-1.2.0.min.js"></script>
+  </head> 
+
+  <body> 
+
+	<div data-role="page" data-theme="a">
+
+	  <div data-role="header" data-position="fixed">
+		<a href='#' class='ui-btn-left' data-icon='arrow-l' data-theme="c" onclick="history.back(); return false">Back</a> <h1>GIF Image Object Methods</h1>
+	  </div><!-- /header -->
+	  <div data-role="content">
+		<div class="samp">&nbsp;gifImage = gif.CreateGifImage( path, width, height);</div>	
+		<p>Creates a GIF Image View. Setting path to <b>null</b> will create a blank placeholder for your GIF image view.<br>
+		  <br><span style="color:#0099CC">Returns:</span> A new GIF Image object or null if an error occured.</p><br>
+		<p><span style="color:#0099CC">The following methods are avaiable on the <b>GIF Image object</b>:</span></p>
+		<div class="samp">&nbsp;gifImage.Play()</div>
+		<p>Play the animated GIF.  If stopped, starts at the current position.</p>
+		<div class="samp">&nbsp;gifImage.Stop()</div>
+		<p>Stop the animated GIF. The animation is paused/stopped at the current position.</p>
+		<div class="samp">&nbsp;gifImage.Reset()</div>
+		<p>Resets the animation to the starting position.</p>
+		<div class="samp">&nbsp;gifImage.SeekTo( milliseconds )</div> 
+		<p>Seek to position (milliseconds).  1000 would seek to 1 second from starting position.</p>
+		<div class="samp">&nbsp;gifImage.IsSeekable( )</div> 
+		<p><span style="color:#0099CC">Returns:</span> Boolean true/false, if the GIF is able to use the <i>SeekTo</i> method</p>
+		<div class="samp">&nbsp;gifImage.GetDuration()</div>
+		<p><span style="color:#0099CC">Returns:</span> Length of the animation in milliseconds.</p>
+		<div class="samp">&nbsp;gifImage.GetPosition()</div> 
+		<p><span style="color:#0099CC">Returns:</span> The current position being played in milliseconds.</p>
+		<div class="samp">&nbsp;gifImage.SetSpeed( int )</div>  
+		<p>Set the speed for the animation.  Can be a Integer between 0 and 5.  <b>1 is normal</b>.  Setting this to .50 will play the animation half as slow as the normal speed.  4 would play the animation 3 times faster than normal. If you change the GIF with the <i>SetImage</i> method, this will need to be set again.
+		</p>
+		<div class="samp">&nbsp;gifImage.Details()</div> 
+		<p><span style="color:#0099CC">Returns:</span> Human readable details about the image; frames, size, and any errors.</p>
+		<div class="samp">&nbsp;gifImage.IsPlaying()</div>
+		<p><span style="color:#0099CC">Returns:</span> Boolean true/false, if the GIF is playing/animated</p>
+		<div class="samp">&nbsp;gifImage.SetImage( path )</div>
+		<p>Changes the GIF to a different  GIF image.  <b>Please remember</b>, after changing the image, you must set the OnAnimationComplete for the new image.</p>
+		<div class="samp">&nbsp;gifImage.OnAnimationComplete( callback )</div> 
+		<p>Sets a callback function for the GIF after one complete display of the GIF animation.  If the GIF loops, it will fire everytime the animation reaches completion <i>before</i> the GIF loops again.  <b>Remember</b>, if you change the GIF image using the SetImage method, you must set this listener again.
+		<div class="samp">&nbsp;gifImage.SetOnTouch( callback )</div>
+        <p>Sets a callback for when the GIF image is touched. This event fires similar to DroidScripts <i>SetOnTouchUp</i>, only once per touch.<p>
+
+		<br><p><span style="color:#0099CC">The following methods are common and also avaiable on the <b>GIF Image object</b>:</span></p>
+
+		<div class="samp">&nbsp;gifImage.GetVisibility()</div>  
+		<div class="samp">&nbsp;gifImage.SetVisibility( visibility )</div>   
+		<div class="samp">&nbsp;gifImage.Show()</div>   
+		<div class="samp">&nbsp;gifImage.Hide()</div>   
+		<div class="samp">&nbsp;gifImage.Gone()</div>   
+		<div class="samp">&nbsp;gifImage.SetPadding( left, top, right, bottom )</div>
+		<div class="samp">&nbsp;gifImage.SetMargins( left, top, right, bottom )</div>
+		<div class="samp">&nbsp;gifImage.SetPosition( left, top, width, height )</div>
+		<div class="samp">&nbsp;gifImage.SetSize( width, height )</div>
+		<div class="samp">&nbsp;gifImage.GetWidth()</div>
+		<div class="samp">&nbsp;gifImage.GetHeight()</div> 
+		<div class="samp">&nbsp;gifImage.SetBackColor( colorCode )</div>
+		<br>
+
+	  </div><!-- /content -->
+
+	</div><!-- /page -->
+
+  </body>
+</html>

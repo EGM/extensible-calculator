@@ -1,0 +1,230 @@
+<!DOCTYPE html> 
+<html>
+
+  <head>
+	<title>GIF Image Methods</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet"  href="css/themes/default/theme.min.css" />
+	<link rel="stylesheet"  href="css/themes/default/jquery.mobile.structure-1.2.0.min.css" />
+	<script src="js/energize-min.js"></script>
+	<script src="js/jquery-1.8.1.min.js"></script>
+	<script src="../../../app.js"></script>
+	<script src="js/example.js"></script>
+	<link rel="stylesheet" href="css/docs.css" />
+	<script src="js/jquery.mobile-1.2.0.min.js"></script>
+  </head> 
+
+  <body> 
+
+	<div data-role="page" data-theme="a">
+
+	  <div data-role="header" data-position="fixed">
+		<a href='#' class='ui-btn-left' data-icon='arrow-l' data-theme="c" onclick="history.back(); return false">Back</a> 
+		<h1>GifViewer</h1>
+	  </div><!-- /header -->
+
+	  <div data-role="content">	
+
+<style>
+		.jump { line-height:1.5em;  }
+</style>
+
+<script>
+	function OpenUrl( url,type,choose ) 
+	{ 
+		if( navigator.userAgent.indexOf("Android")>-1 ) {
+			prompt( "#", "App.OpenUrl(\f"+url+"\f"+type+"\f"+choose ); 
+			return false;
+		}
+		else return true;	
+	}
+</script>
+
+		<div align="center"><img src="img/GifViewer.png" width="100px"></div>
+
+		<p>The Graphics Interchange Format (better known by its acronym GIF) is a bitmap image format that was developed by US-based software writer Steve Wilhite while working at the internet service provider CompuServe in 1987 and has since come into widespread usage on the World Wide Web due to its wide support and portability.</p>
+
+		<p>The format supports up to 8 bits per pixel for each image, allowing a single image to reference its own palette of up to 256 different colors chosen from the 24-bit RGB color space. <b>It is best known for its support of animations</b>, and allows a separate palette of up to 256 colors for each frame. </p>
+
+		<p>Android does not natively support the <b>animated</b> GIF format in Image Views.  This plugin allows DroidScript to display the animated format, as well as control them, similar to how you would interact with a video file.</p>
+
+		<p>In order to use GifViewer, you must first load the plugin at the top of your script 
+		  using the <b>LoadPlugin</b> method like this:</p>
+
+		<div class="samp">&nbsp;app.LoadPlugin( "GifViewer" );</div>
+
+		<p>Then you can create an instance of the plugin object when you need it like this:</p>
+
+		<div class="samp">&nbsp;gif = app.CreateGifViewer();</div><br>
+
+		<p>The first step to using GifViewer is to <a href="docs/Controls.html">Create</a> a GIF Image object.</p>
+		<br>
+        <div align="center"><img src="img/spinner.gif"></div>
+		<br>
+		<p>The following methods are provided by the GifViewer plugin instance:</p>
+
+		<ul data-role="listview" data-inset="true" data-filter="false" >
+
+		  <li><a href="docs/Controls.html">GIF Image Object</a></li>
+		  <li><a href="docs/Apk.html">[ ! ] APK Considerations</a></li>
+		</ul>
+		<br>
+
+		<div data-role="collapsible" data-collapsed="true"  data-mini="true" data-theme="a" data-content-theme="b">
+		  <h3>Example - GIF player</h3>
+		  <div id="examp1" style="font-size:70%;white-space:pre-wrap">
+			app.LoadPlugin( "GifViewer" );
+			var  dur = 0, repeat = true;
+
+			/*Called when application is started.*/
+			function OnStart()
+			{   
+			/*Create layout that fills the screen.*/
+			lay = app.CreateLayout( "Linear", "FillXY,VCenter" );
+
+			/*Create GIF Image view.*/
+			gif = app.CreateGifViewer();
+			plgDir = gif._GetPlgDir();
+			gifView = gif.CreateGifImage( null , 0.9, 0.4 );
+			lay.AddChild( gifView );
+
+			/*Create GIF list.*/
+			spin = app.CreateSpinner( "...,DOG,CAT" );
+			spin.SetSize( 0.8, -1 );
+			spin.SetOnTouch( spn_OnTouch );
+			lay.AddChild( spin );
+
+			/* Create Buttons layout*/
+			btnLay = app.CreateLayout( "Linear", "Horizontal,Center,VCenter" );
+			btnLay.SetMargins(0,0.05,0,0);
+			btnPlay = app.CreateButton( "Play", 0.3, 0.1 );
+			btnPlay.SetOnTouch( btnPlay_OnTouch );
+			btnLay.AddChild( btnPlay ); 
+			btnStop = app.CreateButton( "Stop", 0.3, 0.1 );
+			btnStop.SetOnTouch( btnStop_OnTouch );
+			btnLay.AddChild( btnStop ); 
+			btnRepeat = app.CreateToggle( "Repeat", 0.3, 0.1 );
+			btnRepeat.SetOnTouch( btnRepeat_OnTouch );
+			btnRepeat.SetChecked( repeat );
+			btnLay.AddChild( btnRepeat );
+			lay.AddChild( btnLay );
+
+			/* Layout for speed control*/
+			speedLay = app.CreateLayout( "Linear", "Horizontal,Center,VCenter" );
+			speedLay.SetMargins(0,0.05,0,0);
+			speedText = app.CreateText ("Animation Speed: ");
+			speedText.SetTextSize( 18 );
+			speedLay.AddChild( speedText );
+			speedSpin = app.CreateSpinner( "Slow,Normal,Fast" );
+			speedSpin.SetSize( 0.3, -1 );
+			speedSpin.SetOnTouch( setSpeed );
+			speedSpin.SelectItem('Normal');
+			speedLay.AddChild( speedSpin );
+			lay.AddChild( speedLay );
+
+			/*  Create Duration Text*/
+			txt = app.CreateText( "0 / 0" );
+			txt.SetTextSize( 18 );
+			txt.SetMargins(0,0.05,0,0);
+			lay.AddChild( txt );
+
+			/*Add main layout to app.*/
+			app.AddLayout( lay );
+
+			/* Update position and duration*/
+			setInterval("Update()", 25);
+			alert( gif.GetVersion() );
+			}
+
+			/*Handle GIF select.*/
+			function spn_OnTouch( item )
+			{
+			gifView.Stop();
+			var gifFile;
+			switch (item) {
+			case "DOG": gifFile = 'img/music_dog'; break;
+			case "CAT":  gifFile = 'img/pet_cat'; break;
+			default: gifFile = 'blank';
+			}
+			gifView.SetImage(plgDir+'/'+gifFile+'.gif');
+			dur = gifView.GetDuration();
+			setSpeed();  
+			gifView.OnAnimationComplete( repeatCheck );
+			}
+
+			/*Handle Play button.*/
+			function btnPlay_OnTouch() 
+			{
+			gifView.Play();
+			}
+
+			/*Handle Pause button.*/
+			function btnStop_OnTouch() 
+			{
+			gifView.Stop();
+			}
+
+			/* Handle Repeat Button*/
+			function btnRepeat_OnTouch( checked ) {
+			repeat = checked;
+			}
+
+			/*Update duration text.*/
+			function Update()
+			{
+			var  prog = gifView.GetPosition();
+			txt.SetText( prog + ' / ' + dur );
+			}
+
+			/* OnAnimationComplete callback*/
+			function repeatCheck() {
+			if ( !repeat ) { gifView.Stop(); gifView.SeekTo(0); }
+			}
+
+			/* Spinner and on GIF change speed handler*/
+			function setSpeed ( item ) {
+			item = item||speedSpin.GetText();
+			var speed;
+			switch (item) {
+			case 'Slow': speed = .35; break;
+			case 'Fast': speed = 4; break;
+			default: speed = 1;
+			}
+			gifView.SetSpeed( speed );
+			}</div>
+		  <div name="divCopy" align="right">
+			<a href="#" data-role="button" data-mini="true" data-inline="true" onclick="copy(examp1)">Copy All</a>
+			<a href="#" data-role="button" data-mini="true" data-inline="true" onclick="demo(examp1)">&nbsp;&nbsp;&nbsp;Run&nbsp;&nbsp;&nbsp;</a>
+		  </div>
+		</div>
+		<br>
+		<p><b><span style="color:#0099CC"><large>Path to GIF files:</large></span></b><br>Please see <a href="docs/Apk.html">APK Considerations</a> above.</p>
+		<div class="samp">&nbsp;gif.GetGifPath( NameOfGIFwithoutExtension );</div>
+		<p>Returns the full path to 'name'.gif image.  This will either be a folder under your DroidScript IDE app (/sdcard/DroidScript/YourApp/Gif/name.gif) or a private folder extracted from your compiled APKs.</p>
+		<div data-role="collapsible" data-collapsed="false"  data-mini="true" data-theme="a" data-content-theme="b">
+		  <h3>Example - GetGifPath</h3>
+		  <b id="snip1" style="font-size:100%">gif.GetGifPath( 'spinner' );</b>                
+		  <div name="divCopy" align="right">
+			<a href="#" data-role="button" data-mini="true" data-inline="true" onclick="copy(snip1)">&nbsp;&nbsp;Copy&nbsp;&nbsp;</a>
+		  </div>
+		</div>
+		<p>Will return the full path to <i>spinner.gif</i></p>
+		<br>
+		<p><b><span style="color:#0099CC"><large>Version Information:</large></span></b></p>
+		<div class="samp">&nbsp;gif.GetVersion();</div>
+		<p>Returns the plugin author and version.</p>
+		<br>
+		<p><b><span style="color:#0099CC"><large>Error Handling:</large></span></b></p>
+		<div class="samp">&nbsp;gif.GetError();</div>
+		<p>Returns either false (No error) or the details of the error. </p>
+		<br>
+		<p><span style="color:#0099CC">This plugin was written by Chris Ferrell, it is free to use in your projects.  <b>A credit line if used would be nice, but not required. :)</b></span></p>
+        <div align="center"><img src="img/ty.gif"></div>
+		<br>
+		<small>This plugin utilizes android-gif-drawable, which is licensed under the <a href="docs/License.html">MIT License</a>.</small>
+	  </div><!-- /content -->
+
+	</div><!-- /page -->
+
+  </body>
+</html>

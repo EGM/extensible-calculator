@@ -1,0 +1,47 @@
+
+<!DOCTYPE html> 
+<html>
+
+<head>
+	<title>ColorHunter</title> 
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+        <style type="text/css">
+        </style>
+</head> 
+
+<body> 
+
+<div data-role="page" data-theme="a">
+
+	<div data-role="header" data-position="fixed">
+		<a href='#' class='ui-btn-left' data-icon='arrow-l' data-theme="c" onclick="history.back(); return false">Back</a> 
+		<h1>ColorHunter</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+			
+		<p>ColorHunter is a plugin to get dominant color and make a color palette from a image. <br>In order to use ColorHunter, you must first load the plugin at the top of your script 
+		using the <b>LoadPlugin</b> method like this:</p>
+		
+		<div class="samp">&nbsp;app.LoadPlugin( "ColorHunter" );</div>
+		
+		<p>For getting dominant color</p>
+		
+		<div class="samp">&nbsp;var Color = getDominantColor( img );</div>
+		  <p>Where:<br></p>
+		<p>img - image src<p>
+		<br>
+		<p>For getting colors palette</p>
+		
+		<div class="samp">&nbsp;var Color = getPalette( img, opacity, count );</div>
+		<p>Where:<br></p>
+		<p>img - image src<br>opacity - count of opacity added to the color<br>count - how many colors wanted, you can set 0 to 1, where 1 = 100, 0.1 = 10</p>
+		<br>
+			<br>
+				<p>created by NIKHIL BABYCHAN</p>
+	</div><!-- /content -->
+	
+</div><!-- /page -->
+
+</body>
+</html>

@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <link rel="stylesheet" href="demo.css" />
-    <link rel="stylesheet" href="lib/mocha.css" />
-	<script src="file:///android_asset/app.js"></script>
+    <link rel="stylesheet" href="mocha.css" />
   </head>
   <body>
 	<div id="demo">
@@ -18,11 +17,11 @@
 	<table>
 	  <tr>
 		<th>Expression: </th>
-		<td><input class="active" type="text" id="expr" value="5 + 5" autofocus="autofocus" onchange="getResult()"/></td>
+		<td><input class="active" type="text" id="expr" value="5 + 5" autofocus="autofocus"/></td>
 		<td rowspan="2"><button class="demo" onclick="getResult()">Get Result</button></td></tr>
 	  <tr>
 		<th>Result: </th>
-		<td><input class="active" type="text" id="rslt" onchange="getResult()"/></td>
+		<td><input class="disabled" type="text" id="rslt" disabled="disabled"/></td>
 	  </tr>
       <tr>
         <th class="lower16">Available </th>
@@ -43,10 +42,10 @@
 	<hr />
 	<h2 class="title">Testing</h2>
     <div id="mocha"></div>
-    <script src="lib/mocha.js"></script>
+    <script src="mocha.js"></script>
     <script>mocha.setup('bdd')</script>
-    <script src="../extensible-calculator.js"></script>
-    <script src="lib/should.js"></script>
+    <script src="xcalc.js"></script>
+    <script src="should.js"></script>
     <script src="tests.js"></script>
 	<script>
       var xcalc = new ExtensibleCalculator();
@@ -54,8 +53,8 @@
       grbr.value = xcalc.brackets.list.join("\u2002");
 	  function getResult() {
 	    rslt.value = xcalc.calculate(xcalc.convert(expr.value)).valueOf();
-		expr.focus();
 	  }
+	  //alert("Pattern: "+xcalc.pattern())
     
 	</script>
 	
