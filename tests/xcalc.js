@@ -27,6 +27,7 @@ function ExtensibleCalculator(options={}){
 //
     xcGroupingError.prototype=Object.create (SyntaxError.prototype); 
     xcGroupingError.prototype.constructor=xcGroupingError;
+    this.xcGroupingError=xcGroupingError;
 //
     function xcTokenError(message){ 
         this.name="xcTokenError"; 
@@ -36,6 +37,7 @@ function ExtensibleCalculator(options={}){
 //
     xcTokenError.prototype=Object.create (SyntaxError.prototype); 
     xcTokenError.prototype.constructor=xcTokenError; 
+    this.xcTokenError=xcTokenError;
 //
     var operators = { 
         "^": { 
@@ -54,7 +56,7 @@ function ExtensibleCalculator(options={}){
             precedence: 3, 
             associativity: "Left", 
             arity: 2,
-            fn: function (multiplier, multiplicand){ return multiplier*multiplicand; }
+            fn: function (multiplier, multiplicand){ return multiplier*multiplicand}
         },
         "+": { 
             precedence: 2, 
@@ -97,7 +99,8 @@ function ExtensibleCalculator(options={}){
         };
     };
     Object.defineProperty (operators, "define", { value: define });
-//
+    this.operators=operators;
+// 
     var brackets = {
         "(": {
             type: "Open",
@@ -150,6 +153,7 @@ function ExtensibleCalculator(options={}){
 	Object.defineProperty (brackets, "count", { value: function(type, string){ var re=new RegExp ("[\\"+brackets.list.filter ( function(element){ return brackets[element].type===type;}).join ("\\")+"]", "g"); return (!string.match (re)?0:string.match (re).length);} });
 //
     Object.defineProperty (brackets, "isImbalanced", { value: function(string){ return brackets.count ("Open", string)!==brackets.count ("Close", string);} });
+    this.brackets=brackets;
 //
     function pattern() {
         var bracketsPattern = "\\"+ brackets.list.join ("\\");
@@ -158,6 +162,14 @@ function ExtensibleCalculator(options={}){
         var re = RegExp ("([" + bracketsPattern + operatorsSymbols + "]" + (operatorsText.length>1?operatorsText:"")+")","img");
         return re;
     }
+	this.pattern=pattern;
+//
+	function multiplicationSymbol() {
+		var pattern = /\*/
+		var s = operators.list.filter( function( o ){ return pattern.test(String(operators[o].fn));});
+		return s.pop();
+	}
+	this.multiplicationSymbol = multiplicationSymbol;
 //
     class Token {
         static is (tokenA, tokenB){return tokenA.value==tokenB.value;}
@@ -169,6 +181,8 @@ function ExtensibleCalculator(options={}){
                 case Token.isToken (tbno):
                     this._value=tbno._value;
                     break;
+				case tbno === ".":
+					tbno = "0" + tbno;
                 case this.isBracket (tbno):
                 case this.isNumeric (tbno):
                 case this.isOperator (tbno):
@@ -178,15 +192,18 @@ function ExtensibleCalculator(options={}){
                     this._value=null;					
                     break;
                 default:
-                    throw new xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
-                          }
+					if (!settings.failSilent) {
+                    	throw new xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
+					}
+			}
         }
         isBracket  (s=this.value){return brackets.isOpen (s)||brackets.isClose (s);}
         isNumeric  (s=this.value){return !isNaN (parseFloat (s))&&isFinite (parseFloat (s));}
         isOperator (s=this.value){return operators.isOperator (s);}
-        toString   (){return this.value.toString ();}
+        toString   (){return !this.value?"":this.value.toString ();}
         valueOf    (){return parseFloat (this.value);}
     }
+    this.Token=Token;
 //
     class Tokens {
         static is (tokensA, tokensB) {
@@ -228,24 +245,38 @@ function ExtensibleCalculator(options={}){
         }
         get length () { return this._value.length; }
         getAt (index) { return this._value[index]; }
+		insertAt (index, operator) { this._value.splice(index, 0, operator); }
         peek ()  { return this._value[this.length-1]; }
         pop  ()  { return this._value.pop (); }
         push (value) { 
             if ( Token.isToken (value) ){ return this._value.push (value); }
             else{ return this._value.push (new Token (value)); }
         }
+		toExpr   () { /*alert(this._value.toString().replace(/,/img,""));*/ return this._value.toString().replace(/,/img,""); }
         toString () { return this._value.toString (); }
         valueOf  () { return this._value.map (function(x){return x.value;}); }
         clone    () { return new Tokens (Array.from (this._value.slice ())); }
     }
-//
-    this.xcGroupingError=xcGroupingError;
-    this.xcTokenError=xcTokenError;
-    this.operators=operators;
-    this.brackets=brackets;
-	this.pattern=pattern;
-    this.Token=Token;
     this.Tokens=Tokens;
+//
+
+	this.correct=function( expr, symbol){
+		if (!operators.isOperator(symbol)){
+			symbol=multiplicationSymbol();
+		}
+		tokens = new Tokens( expr );
+		for (var i=1; i<tokens.length; i+=1 ){
+			var previous = tokens.getAt(i-1);
+			var token = tokens.getAt(i);
+			
+			if ((token.isNumeric() && brackets.isClose(previous.value)) ||
+				(brackets.isOpen(token.value) && previous.isNumeric())){
+					var s = new Token(symbol);
+					tokens.insertAt(i, s);
+			}
+		}
+		return tokens.toExpr();
+	};
 //
     this.convert=function (...args){
         if ( Tokens.isTokens (args[0]) ){
@@ -305,7 +336,7 @@ function ExtensibleCalculator(options={}){
         else{
             var tokens = new Tokens (o);
         }
-        if (tokens.length===0) return "HA!!!";
+        if (tokens.length===0) return NaN;
         var stack = new Tokens ();
         for ( var i=0; i<tokens.length; i+=1 ){
             var token = tokens.getAt (i);
@@ -323,7 +354,7 @@ function ExtensibleCalculator(options={}){
                         var o2 = stack.pop ();
                         stack.push (operators[token.toString ()].fn (o2, o1));
                     }
-                } catch (e) { /*alert (tokens+"\n"+token.toString ());*/ throw e}
+                } catch (e) { if (!settings.failSilent)   throw e}
             }
         }
         return stack.pop ();

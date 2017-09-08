@@ -169,6 +169,8 @@ function ExtensibleCalculator(options={}){
                 case Token.isToken (tbno):
                     this._value=tbno._value;
                     break;
+				case tbno === ".":
+					tbno = "0" + tbno;
                 case this.isBracket (tbno):
                 case this.isNumeric (tbno):
                 case this.isOperator (tbno):
@@ -178,13 +180,15 @@ function ExtensibleCalculator(options={}){
                     this._value=null;					
                     break;
                 default:
-                    throw new xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
-                          }
+					if (!settings.failSilent) {
+                    	throw new xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
+					}
+			}
         }
         isBracket  (s=this.value){return brackets.isOpen (s)||brackets.isClose (s);}
         isNumeric  (s=this.value){return !isNaN (parseFloat (s))&&isFinite (parseFloat (s));}
         isOperator (s=this.value){return operators.isOperator (s);}
-        toString   (){return this.value.toString ();}
+        toString   (){return !this.value?"":this.value.toString ();}
         valueOf    (){return parseFloat (this.value);}
     }
 //
@@ -228,6 +232,7 @@ function ExtensibleCalculator(options={}){
         }
         get length () { return this._value.length; }
         getAt (index) { return this._value[index]; }
+		insertAt (index, value) { this._value.splice(index, 0, value); }
         peek ()  { return this._value[this.length-1]; }
         pop  ()  { return this._value.pop (); }
         push (value) { 
@@ -246,6 +251,21 @@ function ExtensibleCalculator(options={}){
 	this.pattern=pattern;
     this.Token=Token;
     this.Tokens=Tokens;
+//
+	this.correct=function( expr ){
+		var tokens = new Tokens( expr.split(pattern) );
+		for (var i=1; i<tokens.length; i+=1 ){
+			var previous = tokens.getAt(i-1);
+			var token = tokens.getAt(i);
+			
+			if ((token.isNumeric() && brackets.isClose(previous.value)) ||
+				(brackets.isOpen(token.value) && previous.isNumeric())){
+					tokens.insertAt(i, new Token("*"));
+			}
+			
+		}
+		return tokens.toString();
+	};
 //
     this.convert=function (...args){
         if ( Tokens.isTokens (args[0]) ){
@@ -305,7 +325,7 @@ function ExtensibleCalculator(options={}){
         else{
             var tokens = new Tokens (o);
         }
-        if (tokens.length===0) return "HA!!!";
+        if (tokens.length===0) return NaN;
         var stack = new Tokens ();
         for ( var i=0; i<tokens.length; i+=1 ){
             var token = tokens.getAt (i);

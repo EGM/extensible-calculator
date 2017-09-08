@@ -1,32 +1,38 @@
+// Globally shared variables.
 var raw = "";
 var undostack = [];
 var display = [];
+var xcalc;
 
+// Called when application is started.
 function OnStart(){
 	app.LoadScript ("xcalc.js", OnScriptLoaded);
 }
 
+// Called after script is loaded.
 function OnScriptLoaded(){
-	// Create layout, displays, and buttons.
+	
+	// Create layout.
 	var background = app.CreateLayout ("Linear", "VCenter,FillXY");
 	background.SetBackColor ("#33cc33");
 
-	var p=[[0.075,-0.02,0.04],[0.075,0,0.03],[0.050,0,0.005]];
+	// Create raw and result displays.
+	var p=[[0.075,-0.02,0.02,1.8],[0.075,0,0.01,1.4]];
 	for ( var i=0; i<2; i+=1 ){
-		display[i]=app.CreateText (i+1, 0.8, p[i][0]);
-		display[i].SetTextColor ("White");
+		display[i]=app.CreateText( "", 0.8, p[i][0], "AlignRight" );
+		display[i].SetTextColor( "White" );
 		display[i].SetBackColor ("#ff222222");
 		display[i].SetTextShadow (20, 0, 0, "White");
-		display[i].SetFontFile ("Fonts/lcd.ttf");
 		display[i].SetMargins (0, p[i][1], 0, 0);
-		display[i].SetPadding (0, p[i][2], 0, 0);
+		display[i].SetPadding (0, p[i][2], 0.02, 0);
+		display[i].SetTextSize (display[i].GetTextSize() * p[i][3]);
 		background.AddChild (display[i]);
 	}
-	display[0].SetTextSize (display[0].GetTextSize ()*1.5);
-	display[1].SetTextSize (display[1].GetTextSize ()*1.2);
 
+	// Create rows of keys.
 	var row = app.CreateLayout ("Linear", "Horizontal");
-	"(,),^,\uf0e2,7,8,9,÷,4,5,6,×,1,2,3,-,0,.,C,+,="
+	row.SetMargins( 0, 0.02, 0, 0 );
+	"\u27ee,\u27ef,^,\uf0e2,7,8,9,÷,4,5,6,×,1,2,3,-,0,.,C,+,="
 		.split (",")
 		.map (function(char, position, keys){ 
 				  var isLastColumn = function( p ){ return p % 4 === 0; }; //4 columns of keys.
@@ -45,12 +51,14 @@ function OnScriptLoaded(){
 				  }
 			  });
 			  
+	xcalc = new ExtensibleCalculator();
+	xcalc.operators.define( "×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; });
+	xcalc.operators.define( "÷", 3, "Left", 2, function (dividend, divisor){ return dividend/divisor; });
+
 	app.AddLayout( background );
 }
 
 function OnKeyPressed(){
-	var xcalc = new ExtensibleCalculator();
-	var swap = { "×":"*", "÷":"/", "π":Math.PI.toFixed(8) };
 	var key = app.GetLastButton ().GetText ();
 	var result = "";
 	switch ( key ){
@@ -63,19 +71,27 @@ function OnKeyPressed(){
 			display[1].SetText( "" );
 			break;
 		case "=":
-			display[0].SetText( xcalc.calculate( xcalc.convert( raw )));
+			raw = xcalc.calculate( xcalc.convert( raw )).toString();
+			undostack = [ raw.length ];
 			break;
-		case "×":
-		case "÷":
-		case "π":
-			key = swap[key];
+		case ".":
+			if (raw==""){
+				raw = "0."; 
+	 			undostack.push( 2 ); 
+			}
+			else {
+			raw += key; 
+	 		undostack.push( key.length ); 				
+			}
+			break;
 		default:
 			raw += key; 
 	 		undostack.push( key.length ); 
 	}
+	raw = xcalc.correct( raw );
 	display[0].SetText( raw );
-	result = xcalc.calculate( xcalc.convert( raw ));
-	if (typeof result === "undefined") {
+	result = xcalc.calculate( xcalc.convert( raw )).toString();
+	if (isNaN( result )) { 
 		display[1].SetText( "" );
 	}
 	else {

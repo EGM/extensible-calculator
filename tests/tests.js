@@ -141,7 +141,7 @@ it("should define Token 'isOperator' class method", function() {
 });
 
 it("should define Token 'value' class property", function() {
-	var xcalc = new ExtensibleCalculator();
+	var xcalc = new ExtensibleCalculator({failSilent:false});
 
 	var token1 = new xcalc.Token("1");
 	token1.value.should.exist;
@@ -345,3 +345,43 @@ it("should extend function (adding 'sin' & 'cos') 'calculate'", function() {
 	var postfix = xcalc.convert("sin"+radians1+"+cos"+radians2);
 	xcalc.calculate(postfix).valueOf().should.equal(0);
 });
+
+it("should define 'multiplicationSymbol' function", function() {
+	var xcalc = new ExtensibleCalculator();
+
+	xcalc.multiplicationSymbol.should.exist;
+	xcalc.multiplicationSymbol().should.equal("*");
+
+	xcalc.operators.define("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal(true);
+	xcalc.operators.define("•", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal(true);
+
+	xcalc.multiplicationSymbol().should.equal("•");
+	
+	xcalc.operators.define("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal(false);
+	xcalc.operators.define("•", 3, "Left", 2, function (A, B){ return A * B }).should.equal(false);
+});
+
+it("should correct poorly expressed input", function() {
+	var xcalc = new ExtensibleCalculator();
+
+	xcalc.correct.should.exist;
+	
+	xcalc.correct("7").should.equal("7");
+	xcalc.correct("(").should.equal("(");
+	new xcalc.Tokens("7(").length.should.equal(2);
+	
+	xcalc.correct("7(").should.equal("7*(");
+	xcalc.correct(")7").should.equal(")*7");
+	xcalc.correct("7(","×").should.equal("7*(");
+	xcalc.correct(")7","×").should.equal(")*7");
+	
+	xcalc.operators.define("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal(true);
+	xcalc.correct("7(").should.equal("7×(");
+	xcalc.correct(")7").should.equal(")×7");
+	xcalc.correct("7(","•").should.equal("7×(");
+	xcalc.correct(")7","•").should.equal(")×7");
+});
+
+
+
+
