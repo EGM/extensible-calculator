@@ -1,0 +1,8 @@
+{
+	"manifest": {
+		"minSdkVersion":"11",
+		"targetSdkVersion":"15",
+		"debuggable":true,
+		"homeScreen":false
+	}
+}

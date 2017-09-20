@@ -43,19 +43,20 @@
 	<h2 class="title">Testing</h2>
     <div id="mocha"></div>
     <script src="mocha.js"></script>
-    <script>mocha.setup('bdd')</script>
-    <script src="xcalc.js"></script>
+    <script>mocha.setup('bdd');</script>
+    
+	<script src="extensible-calculator.js"></script>
+	
     <script src="should.js"></script>
     <script src="tests.js"></script>
 	<script>
-      var xcalc = new ExtensibleCalculator();
-      oper.value = xcalc.operators.list.join("\u2002");
-      grbr.value = xcalc.brackets.list.join("\u2002");
+	  var EN_SPACE = "\u2002";
+	  var xcalc = new xc.calculator();
+      oper.value = xc.operators.list.join(EN_SPACE);
+      grbr.value = xc.brackets.list.join(EN_SPACE);
 	  function getResult() {
 	    rslt.value = xcalc.calculate(xcalc.convert(expr.value)).valueOf();
 	  }
-	  //alert("Pattern: "+xcalc.pattern())
-    
 	</script>
 	
     <script>

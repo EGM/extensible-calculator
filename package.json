@@ -1,0 +1,33 @@
+{
+  "name": "extensible-calculator",
+  "description": "Calculates solution for string based expression.",
+  "version": "0.1.0",
+  "maintainers": [
+    {
+      "name": "John LaDuke",
+      "email": "egmono@gmail.com",
+      "web": ""
+    }
+  ],
+  "bugs": {
+    "web": "https://github.com/EGM/extensible-calculator/issues/new"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/EGM/extensible-calculator.git"
+    }
+  ],
+  "licenses": [
+    {
+      "name": "MIT",
+      "url": "https://github.com/EGM/extensible-calculator/blob/master/LICENSE"
+    },
+    {
+      "name": "BEER-WARE",
+      "url": "https://github.com/EGM/extensible-calculator/blob/master/LICENSE"
+    }
+  ]
+}
+
+
