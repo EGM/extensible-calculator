@@ -171,10 +171,8 @@
                     this._value=null;					
                     break;
                 default:
-				    var error = new xcThis.xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
-				    this._value=error; 
                     if ( !xcThis.settings.failSilent ){
-                        throw error;
+                        throw new xcThis.xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
                     }
                           }
         }

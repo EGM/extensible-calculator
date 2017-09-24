@@ -10,7 +10,7 @@
  *   values or solutions by a mathematical 
  *   process.
  *
- *   MIT license.
+ *   Dual MIT / Beer-Ware license, see https://github.com/EGM/extensible-calculator/blob/master/LICENSE
  */
 (function (root, factory){
     if ( typeof define==='function'&&define.amd ){
@@ -171,10 +171,8 @@
                     this._value=null;					
                     break;
                 default:
-				    var error = new xcThis.xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
-				    this._value=error; 
                     if ( !xcThis.settings.failSilent ){
-                        throw error;
+                        throw new xcThis.xcTokenError ("expected valid number or defined operator instead of '"+tbno+"'");
                     }
                           }
         }

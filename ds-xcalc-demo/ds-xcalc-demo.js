@@ -6,7 +6,7 @@ var xcalc;
 
 // Called when application is started.
 function OnStart(){
-	app.LoadScript ("xcalc.js", OnScriptLoaded);
+	app.LoadScript ("extensible-calculator.js", OnScriptLoaded);
 }
 
 // Called after script is loaded.
@@ -51,9 +51,9 @@ function OnScriptLoaded(){
 				  }
 			  });
 			  
-	xcalc = new ExtensibleCalculator();
-	xcalc.operators.define( "×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; });
-	xcalc.operators.define( "÷", 3, "Left", 2, function (dividend, divisor){ return dividend/divisor; });
+	xcalc = new xc.calculator();
+	xc.operators.define( "×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; });
+	xc.operators.define( "÷", 3, "Left", 2, function (dividend, divisor){ return dividend/divisor; });
 
 	app.AddLayout( background );
 }
