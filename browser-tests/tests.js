@@ -17,25 +17,25 @@ describe ("xc", function(){
 		//xc.calculator.GroupingError
 		describe (".GroupingError()", function(){
 			it ("should define error", function(){
-				new xc.calculator ().xcGroupingError.should.exist;
+				new xc.calculator ().GroupingError.should.exist;
 			  });
 			it ("should be throwable", function(){
-				(function(){throw new new xc.calculator ().xcGroupingError ();}).should.throw(new xc.calculator ().xcGroupingError);
+				(function(){throw new new xc.calculator ().GroupingError ();}).should.throw(new xc.calculator ().GroupingError);
 			  });
 			it ("should be catchable", function(){
-				try{throw new new xc.calculator ().xcGroupingError ();} catch (e){ e.message.should.equal ("Grouping Error");}
+				try{throw new new xc.calculator ().GroupingError ();} catch (e){ e.message.should.equal ("Grouping Error");}
 			  });
 		  });					
 		//xc.calculator.TokenError
 		describe (".TokenError()", function(){
 			it ("should define error", function(){
-				new xc.calculator ().xcTokenError.should.exist;
+				new xc.calculator ().TokenError.should.exist;
 			  });
 			it ("should be throwable", function(){
-				(function(){throw new new xc.calculator ().xcTokenError ();}).should.throw(new xc.calculator ().xcTokenError);
+				(function(){throw new new xc.calculator ().TokenError ();}).should.throw(new xc.calculator ().TokenError);
 			  });
 			it ("should be catchable", function(){
-				try{throw new new xc.calculator ().xcTokenError ();} catch (e){ e.message.should.equal ("Token Error");}
+				try{throw new new xc.calculator ().TokenError ();} catch (e){ e.message.should.equal ("Token Error");}
 			  });
 		  });					
 		//xc.calculator.multiplicationSymbol()
@@ -67,6 +67,15 @@ describe ("xc", function(){
 			it ("should leave number alone", function(){
 				new xc.calculator ().correct ("7").should.equal ("7");
 			  });
+			it ("should leave negative number alone", function(){
+				new xc.calculator ().correct ("-7").should.equal ("-7");
+			  });
+			it ("should leave negative number alone", function(){
+				new xc.calculator ().correct (-7).should.equal (-7);
+			  });
+			it ("should leave negative number alone", function(){
+				new xc.calculator ().correct (-7).should.equal (-7);
+			  });
 			it ("should leave bracket alone", function(){
 				new xc.calculator ().correct ("(").should.equal ("(");
 			  });
@@ -74,13 +83,16 @@ describe ("xc", function(){
 				new xc.calculator ().correct ("7(").should.equal ("7*(");
 			  });
 			it ("should insert multiplication symbol", function(){
+				new xc.calculator ().correct (new xc.Tokens(7,"(").toString()).should.equal ("7*(");
+			  });
+			it ("should insert multiplication symbol", function(){
 				new xc.calculator ().correct (")7").should.equal (")*7");
 			  });
 			it ("should ignore non-operator symbol", function(){
-				new xc.calculator ().correct ("7(", "×").should.equal ("7*(");
+				new xc.calculator ({symbol:"×"}).correct ("7(").should.equal ("7*(");
 			  });
 			it ("should ignore non-operator symbol", function(){
-				new xc.calculator ().correct (")7", "×").should.equal (")*7");
+				new xc.calculator ({symbol:"×"}).correct (")7").should.equal (")*7");
 			  });
 			it ("should insert multiplication symbol", function(){
 				xc.operators.reset ();
@@ -95,13 +107,13 @@ describe ("xc", function(){
 			it ("should insert default multiplication symbol", function(){
 				xc.operators.reset ();
 				xc.operators.define ("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
-				new xc.calculator ().correct ("7(", "•").should.equal ("7×(");
+				new xc.calculator ({symbol:"•"}).correct ("7(").should.equal ("7×(");
 			  });
 			it ("should insert specific multiplication symbol", function(){
 				xc.operators.reset ();
 				xc.operators.define ("•", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
 				xc.operators.define ("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
-				new xc.calculator ().correct (")7", "•").should.equal (")•7");
+				new xc.calculator ({symbol:"•"}).correct (")7").should.equal (")•7");
 			  });
 		  });					
 		//xc.calculator.convert()
@@ -149,13 +161,13 @@ describe ("xc", function(){
 				new xc.calculator ().calculate.should.exist;
 			  });
 			it ("should convert and calculate", function(){
-				var xcalc = new xc.calculator ();
+				var xcalc = new xc.calculator ({postfix:true});
 				var infix = "( 2 + 2 )";
 				var postfix = xcalc.convert (infix);
 				xcalc.calculate (postfix).valueOf ().should.be.equal (4);
 			  });
 			it ("should define and calculate", function(){
-				var xcalc = new xc.calculator ();
+				var xcalc = new xc.calculator ({postfix:true});
 				xc.operators.define ("%", 3, "Left", 2, function (dividend, divisor){ return dividend%divisor; }).should.equal (true);
 				var infix = " 42 % 2 ";
 				var postfix = xcalc.convert (infix);
@@ -183,8 +195,9 @@ describe ("xc", function(){
 				xcalc.calculate (postfix).valueOf ().should.be.eql (-1);
 			  });
 			it ("should extend function (adding 'sin' & 'cos') 'calculate'", function(){
-				var xcalc = new xc.calculator ();
+				var xcalc = new xc.calculator ({postfix:true});
 				xc.operators.reset ();
+//				alert(xcalc.pattern());
 
 				var radians1 = 90*(Math.PI/180);
 				xc.operators.define ("sin", 4, "Left", 1, function (angle){ return Math.sin (angle); }).should.equal (true);
@@ -216,6 +229,27 @@ describe ("xc", function(){
 			it ("should work after remove", function(){
 				xc.reserved.pop ();
 				xc.reserved.isReserved (".").should.not.equal (true);
+			  });
+		  });
+	  });
+    //xc.substitutes
+	describe (".substitutes", function(){
+		it ("should define object", function(){
+			xc.substitutes.should.exist;
+		  });
+		//xc.substitutes.list
+		describe (".list", function(){
+			it ("should define property", function(){
+				xc.substitutes.should.have.property ("list");
+			  });
+			it ("should return Array", function(){
+				xc.substitutes.list.should.be.Array;
+			  });
+		  });
+		//xc.substitutes.isSubstitute
+		describe (".isSubstitute()", function(){
+			it ("should define method", function(){
+				xc.substitutes.should.have.property ("isSubstitute");
 			  });
 		  });
 	  });
@@ -452,6 +486,17 @@ describe ("xc", function(){
 				token1.isOperator ().should.equal (false);
 			  });
 		  });
+		//xc.Token.isSubstitute
+		describe (".isSubstitute()", function(){
+			it ("should define method", function(){
+				new xc.Token ("{PI}").isSubstitute.should.exist;
+			  });
+			it ("should test this - var", function(){
+				var token1 = new xc.Token ("{PI}");
+				token1.isSubstitute ("{PI}").should.equal (true);
+				token1.isSubstitute ().should.equal (false);
+			  });
+		  });
 		//xc.Token.value
 		describe (".value", function(){
 
@@ -469,17 +514,17 @@ describe ("xc", function(){
 			  });
 			it ("should fail silently, value === error", function(){
 			    var token1 = new xc.Token (";");
-				var error1 = new new xc.calculator ().xcTokenError ();
+				var error1 = new new xc.calculator ().TokenError ();
 				should.equal (token1.value.name, error1.name);
 			  });
 			it ("should fail silently, value instanceof error", function(){
 			    var token1 = new xc.Token (";");
-				var error2 = new xc.calculator ().xcTokenError;
+				var error2 = new xc.calculator ().TokenError;
 				should.equal (token1.value instanceof error2, true);
 			  });
 			it ("should fail with error", function(){
 				var xcalc = new xc.calculator ({failSilent:false});
-				should.throws (function(){new xc.Token (";");}, xcalc.xcTokenError,
+				should.throws (function(){new xc.Token (";");}, xcalc.TokenError,
 				  "expected valid number or defined operator instead of ';'");
 			  });
 			it ("should test this - bracket", function(){
@@ -494,12 +539,16 @@ describe ("xc", function(){
 				token1.isOperator ().should.equal (true);
 			  });
 			it ("should get value of bracket", function(){
-				var token3 = new xc.Token ("(");
-				token3.value.should.equal ("("); //get
+				var token1 = new xc.Token ("(");
+				token1.value.should.equal ("("); //get
 			  });
-			it ("should get empty value as null ", function(){
-				var token4 = new xc.Token ();
-				should.equal (token4.value, null); //get
+			it ("should get empty value as null", function(){
+				var token1 = new xc.Token ();
+				should.equal (token1.value, null); //get
+			  });
+			it ("should substitute to number", function(){
+				var token1 = new xc.Token ("{PI}");
+				token1.value.should.equal (Math.PI);
 			  });
 		  });
 		//xc.Token.toString
@@ -559,6 +608,15 @@ describe ("xc", function(){
 			  });
 			it ("should not be Tokens", function(){
 				xc.Tokens.isTokens (new xc.Token ()).should.not.equal (true);
+			  });
+		  });
+		//xc.Tokens.value	  
+		describe ("._value", function(){
+			it ("should define positive Token", function(){
+				new xc.Tokens (1).getAt(0).value.should.equal(1);
+			  });
+			it ("should define negative Token", function(){
+				new xc.Tokens (-1).getAt(0).value.should.equal(-1);
 			  });
 		  });
 		//xc.Tokens.length	  
@@ -667,6 +725,9 @@ describe ("xc", function(){
 			  });
 			it ("should be String", function(){
 				new xc.Tokens (1, 2, 3).toString ().should.equal ("1,2,3");
+			  });
+			it ("should be String (with sub)", function(){
+				new xc.Tokens (1, "{PI}", 3).toString ().should.equal ("1,"+Math.PI.toString()+",3");
 			  });
 		  });
 		//xc.Tokens.valueOf()

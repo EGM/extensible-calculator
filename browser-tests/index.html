@@ -46,7 +46,21 @@
     <script>mocha.setup('bdd');</script>
     
 	<script src="extensible-calculator.js"></script>
+	<script>
+	 var expr1 = "1 + 2";
+	 var calc1 = new xc.calculator();
+	 var rslt1 = calc1.calculate( expr1 ); //3
+	 
+	 var expr2 = "(1 + 2) * 2"; 
+	 var calc2 = new xc.calculator();
+	 var rslt2 = calc1.calculate( expr2 ); //6
+	 
+	 var expr3 = "-1"; 
+	 var calc3 = new xc.calculator();
+	 var rslt3 = calc1.calculate( expr3 ); //4.5
 	
+	 alert(rslt1+", "+rslt2+", "+rslt3+", ");
+	</script>
     <script src="should.js"></script>
     <script src="tests.js"></script>
 	<script>
@@ -55,7 +69,7 @@
       oper.value = xc.operators.list.join(EN_SPACE);
       grbr.value = xc.brackets.list.join(EN_SPACE);
 	  function getResult() {
-	    rslt.value = xcalc.calculate(xcalc.convert(expr.value)).valueOf();
+	    rslt.value = xcalc.calculate(xcalc.convert(xcalc.correct(expr.value))).valueOf();
 	  }
 	</script>
 	
