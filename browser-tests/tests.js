@@ -65,55 +65,55 @@ describe ("xc", function(){
 				new xc.calculator ().correct.should.exist;
 			  });
 			it ("should leave number alone", function(){
-				new xc.calculator ().correct ("7").should.equal ("7");
+				new xc.calculator ().correct ("7").should.eql (new xc.Tokens ("7"));
 			  });
 			it ("should leave negative number alone", function(){
-				new xc.calculator ().correct ("-7").should.equal ("-7");
+				new xc.calculator ().correct ("-7").should.not.equal ("\u22127");
 			  });
 			it ("should leave negative number alone", function(){
-				new xc.calculator ().correct (-7).should.equal (-7);
+				new xc.calculator ().correct (["-7"]).should.eql (new xc.Tokens (["-7"]));
 			  });
 			it ("should leave negative number alone", function(){
-				new xc.calculator ().correct (-7).should.equal (-7);
+				new xc.calculator ().correct (-7).should.eql (new xc.Tokens (-7));
 			  });
 			it ("should leave bracket alone", function(){
-				new xc.calculator ().correct ("(").should.equal ("(");
+				new xc.calculator ().correct ("(").should.eql (new xc.Tokens ("("));
 			  });
 			it ("should insert multiplication symbol", function(){
-				new xc.calculator ().correct ("7(").should.equal ("7*(");
+				new xc.calculator ().correct ("7(").should.eql (new xc.Tokens ("7*("));
 			  });
 			it ("should insert multiplication symbol", function(){
-				new xc.calculator ().correct (new xc.Tokens(7,"(").toString()).should.equal ("7*(");
+				new xc.calculator ().correct (new xc.Tokens (7, "(")).should.eql (new xc.Tokens (7, "*", "("));
 			  });
 			it ("should insert multiplication symbol", function(){
-				new xc.calculator ().correct (")7").should.equal (")*7");
+				new xc.calculator ().correct (")7").should.eql (new xc.Tokens (")*7"));
 			  });
 			it ("should ignore non-operator symbol", function(){
-				new xc.calculator ({symbol:"×"}).correct ("7(").should.equal ("7*(");
+				new xc.calculator ({symbol:"×"}).correct ("7(").should.eql (new xc.Tokens ("7*("));
 			  });
 			it ("should ignore non-operator symbol", function(){
-				new xc.calculator ({symbol:"×"}).correct (")7").should.equal (")*7");
+				new xc.calculator ({symbol:"×"}).correct (")7").should.eql (new xc.Tokens (")*7"));
 			  });
 			it ("should insert multiplication symbol", function(){
 				xc.operators.reset ();
 				xc.operators.define ("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
-				new xc.calculator ().correct ("7(").should.equal ("7×(");
+				new xc.calculator ().correct ("7(").should.eql (new xc.Tokens ("7×("));
 			  });
 			it ("should insert multiplication symbol", function(){
 				xc.operators.reset ();
 				xc.operators.define ("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
-				new xc.calculator ().correct (")7").should.equal (")×7");
+				new xc.calculator ().correct (")7").should.eql (new xc.Tokens (")×7"));
 			  });
 			it ("should insert default multiplication symbol", function(){
 				xc.operators.reset ();
 				xc.operators.define ("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
-				new xc.calculator ({symbol:"•"}).correct ("7(").should.equal ("7×(");
+				new xc.calculator ({symbol:"•"}).correct ("7(").should.eql (new xc.Tokens ("7×("));
 			  });
 			it ("should insert specific multiplication symbol", function(){
 				xc.operators.reset ();
 				xc.operators.define ("•", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
 				xc.operators.define ("×", 3, "Left", 2, function (multiplier, multiplicand){ return multiplier*multiplicand; }).should.equal (true);
-				new xc.calculator ({symbol:"•"}).correct (")7").should.equal (")•7");
+				new xc.calculator ({symbol:"•"}).correct (")7").should.eql (new xc.Tokens (")•7"));
 			  });
 		  });					
 		//xc.calculator.convert()
@@ -174,7 +174,7 @@ describe ("xc", function(){
 				xcalc.calculate (postfix).valueOf ().should.be.equal (0);
 			  });
 			it ("should extend function (adding 'sin')", function(){
-				var xcalc = new xc.calculator ();
+				var xcalc = new xc.calculator ({postfix:true});
 				var radians = 90*(Math.PI/180);
 				xc.operators.define ("sin", 4, "Left", 1, function (angle){ return Math.sin (angle); }).should.equal (true);
 				var infix = "sin "+radians;
@@ -182,12 +182,13 @@ describe ("xc", function(){
 				postfix.should.be.instanceOf (xc.Tokens);
 				postfix.should.be.lengthOf (2);
 				postfix.valueOf ().should.eql ([""+radians,"sin"]);
-				postfix.getAt (0).toString ().should.equal (""+radians);
-				postfix.getAt (1).should.eql (new xc.Token ("sin"));
+				postfix.toString ().should.equal (""+radians+",sin");
+//				postfix.getAt (1).should.eql (new xc.Token ("sin"));
+				var result = xcalc.calculate (postfix);
 				xcalc.calculate (postfix).valueOf ().should.be.eql (1);
 			  });
 			it ("should extend function (adding 'cos')", function(){
-				var xcalc = new xc.calculator ();
+				var xcalc = new xc.calculator ({postfix:true});
 				var radians = 180*(Math.PI/180);
 				xc.operators.define ("cos", 4, "Left", 1, function (angle){ return Math.cos (angle); }).should.equal (true);
 				var infix = "cos "+radians;
@@ -504,7 +505,7 @@ describe ("xc", function(){
 				new xc.Token ("1").value.should.exist;
 			  });
 			it ("should accept - number", function(){
-				xc.Token.isToken (new xc.Token ("1")).should.equal (true);
+				xc.Token.isToken (new xc.Token ("-1")).should.equal (true);
 			  });
 			it ("should accept - operator", function(){
 				xc.Token.isToken (new xc.Token ("*")).should.equal (true);
@@ -546,6 +547,10 @@ describe ("xc", function(){
 				var token1 = new xc.Token ();
 				should.equal (token1.value, null); //get
 			  });
+			it ("should set to negative number", function(){
+				var token1 = new xc.Token (-7);
+				token1.value.should.equal (-7);
+			  });
 			it ("should substitute to number", function(){
 				var token1 = new xc.Token ("{PI}");
 				token1.value.should.equal (Math.PI);
@@ -586,6 +591,31 @@ describe ("xc", function(){
 		it ("should define class", function(){
 			xc.Tokens.should.exist;
 		  });
+		 //xc.Tokens.constructor.util
+		 describe ("util", function(){
+		   var expr = " (-1 + 5 )";
+		 it ("should define private method strip", function(){
+		    expr = expr.replace (/\s/g, ""); 
+			expr.should.equal ("(-1+5)");
+		 });
+		 it ("should define private method maskSign", function(){
+		     expr = expr.replace (new RegExp ("^-|(\\"+xc.operators.list.join ("\\")+"])-", "img"), "$1\u2212");
+			 expr.should.equal ("\u22121+5");
+		 //			         "\\"+operators.list.filter (function(c){return /([^a-zA-Z])/.test (c);}).join ("\\")+"|"+operators.list.filter (function(c){return /([a-zA-Z])/.test (c);}).join ("|")
+		 });
+		 it ("should define private method tokenize", function(){
+		     expr = expr.split (new xc.calculator().pattern ());
+			 expr.should.eql (["\u22121","+","5"]);
+		 });
+		 it ("should define private method clean", function(){
+		     expr = expr.filter (function(s){ return s!==null&&s!==""&&typeof s!=="undefined";}).slice (); 
+			 expr.should.eql (["\u22121","+","5"]);
+		 });
+		 it ("should define private method unmaskSign", function(){
+		     expr = expr.map (function(s){ return s.replace (/\u2212(.+)/g, "-$1"); }).slice (); 
+			 expr.should.eql (["-1","+","5"]);
+		 });
+		 });			
 		//xc.Tokens.is
 		describe (".is()", function(){
 			it ("should define static method", function(){
@@ -613,10 +643,10 @@ describe ("xc", function(){
 		//xc.Tokens.value	  
 		describe ("._value", function(){
 			it ("should define positive Token", function(){
-				new xc.Tokens (1).getAt(0).value.should.equal(1);
+				new xc.Tokens (1).getAt (0).value.should.equal (1);
 			  });
 			it ("should define negative Token", function(){
-				new xc.Tokens (-1).getAt(0).value.should.equal(-1);
+				new xc.Tokens (-1).getAt (0).value.should.equal (-1);
 			  });
 		  });
 		//xc.Tokens.length	  
@@ -727,7 +757,19 @@ describe ("xc", function(){
 				new xc.Tokens (1, 2, 3).toString ().should.equal ("1,2,3");
 			  });
 			it ("should be String (with sub)", function(){
-				new xc.Tokens (1, "{PI}", 3).toString ().should.equal ("1,"+Math.PI.toString()+",3");
+				new xc.Tokens (1, "{PI}", 3).toString ().should.equal ("1,"+Math.PI.toString ()+",3");
+			  });
+		  });
+		//xc.Tokens.toExpr()
+		describe (".toExpr()", function(){
+			it ("should define method", function(){
+				new xc.Tokens (1, 2, 3).toExpr.should.exist;
+			  });
+			it ("should be String", function(){
+				new xc.Tokens (1, 2, 3).toExpr ().should.equal ("123");
+			  });
+			it ("should be String (with sub)", function(){
+				new xc.Tokens (1, "{PI}", 3).toExpr ().should.equal ("1"+Math.PI.toString ()+"3");
 			  });
 		  });
 		//xc.Tokens.valueOf()

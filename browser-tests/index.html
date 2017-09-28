@@ -51,15 +51,22 @@
 	 var calc1 = new xc.calculator();
 	 var rslt1 = calc1.calculate( expr1 ); //3
 	 
-	 var expr2 = "(1 + 2) * 2"; 
-	 var calc2 = new xc.calculator();
-	 var rslt2 = calc1.calculate( expr2 ); //6
+	 var expr2 = ["(",1,"+",2,")","*",2]; 
+	 var calc2 = new xc.calculator({postfix:true});
+	 var post2 = calc2.convert( expr2 );
+	 var rslt2 = calc2.calculate( post2 ); //6
 	 
-	 var expr3 = "-1"; 
-	 var calc3 = new xc.calculator();
-	 var rslt3 = calc1.calculate( expr3 ); //4.5
+	 var expr3 = -1; 
+	 var calc3 = new xc.calculator({postfix:true});
+	 var rslt3 = calc3.calculate( expr3 ); //4.5
 	
-	 alert(rslt1+", "+rslt2+", "+rslt3+", ");
+	 var expr4 = "-1+5"; 
+	 var calc4 = new xc.calculator();
+	 var rslt4 = calc4.calculate( expr4 ); //4.5
+	
+	 
+	 
+	 alert(rslt1+", "+rslt2+", "+rslt3+", "+rslt4);
 	</script>
     <script src="should.js"></script>
     <script src="tests.js"></script>

@@ -215,6 +215,7 @@
                     this._value=null;					
                     break;
                 default:
+					//alert(typeof tbno+": "+tbno);
 				    var error = new xcThis.TokenError ("expected valid number or defined operator instead of '"+tbno+"'");
 				    this._value=error; 
                     if ( !xcThis.settings.failSilent ){
@@ -252,7 +253,7 @@
                         expr=strip ()
                         expr=maskSign (); 
                         expr=tokenize ();
-						if(args[0].includes("{"))alert(expr);
+//						if(args[0].includes("{"))alert(expr);
                         expr=clean (); 
                         pushAll (this._value, expr);
                     } catch (e) {alert (e.stack);}
@@ -262,7 +263,13 @@
                 }
             }
             function strip      (s=expr){ return s.replace (/\s/g, ""); }
-            function maskSign   (s=expr){ return s.replace (new RegExp ("^-|(\\"+operators.list.join ("\\")+"])-", "img"), "$1\u2212"); }
+            function maskSign   (s=expr){ return s.replace (new RegExp ("^-|(\\"
+			+operators.list.join ("\\")
+			+"])-", "img"), "$1\u2212"); }
+			
+//			         "\\"+operators.list.filter (function(c){return /([^a-zA-Z])/.test (c);}).join ("\\")+"|"+operators.list.filter (function(c){return /([a-zA-Z])/.test (c);}).join ("|")
+
+			
             function tokenize   (s=expr){ return s.split (xcThis.pattern ());} 
             function clean      (a=expr){ return a.filter (function(s){ return s!==null&&s!==""&&typeof s!=="undefined";}).slice (); }
             function unmaskSign (a=expr){ return a.map (function(s){ return s.replace (/\u2212(.+)/g, "-$1"); }).slice (); }
@@ -312,8 +319,8 @@
 				  tokens.insertAt(i, new Token(symbol));
 			}
         }
-		if(args.toString().includes("-"))alert(args+"\n"+tokens.toExpr());
-        return tokens.toExpr();
+//		if(args.toString().includes("-"))alert(args+"\n"+tokens.toExpr());
+        return tokens//.toExpr();
     };
     ExtensibleCalculator.prototype.convert=function (...args){
         if ( Tokens.isTokens (args[0]) ){
@@ -367,7 +374,7 @@
     };
     ExtensibleCalculator.prototype.calculate=function (...args){
 	    if (!this.settings.postfix) {
-		    var tokens = this.convert(this.correct(args));
+		    var tokens = this.convert(this.correct(...args));
 		}
 		else
         if ( Tokens.isTokens (args[0]) ){
