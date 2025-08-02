@@ -9,6 +9,8 @@
  * Type definition for an operator in the calculator.
  * @property precedence - The precedence of the operator (higher means it binds tighter).
  * @property associativity - 'L' for left associative, 'R' for right associative.
+ * @property fn - The function that implements the operator's behavior.
+ * @property arity - The number of operands the operator takes (1 for unary, 2 for binary).
  */
 type OperatorDef = {
   precedence: number;
